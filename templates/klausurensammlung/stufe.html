@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% load url from future %}
+{% load staticfiles %}
+{% load i18n %}
+
+
+
+
+
+
+{% block content %}
+
+<h2> Stufe auswählen </h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+
+<form action = "stufe" method="POST" >
+{% csrf_token %}
+<input type="submit" name="stufe" value="Auswählen" />
+{{ form.as_p }}
+</form>
+{% endblock %}
+
+
+
+

@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load url from future %}
+
+
+
+{% block content %}
+
+<h2> Geben Sie die Parameter an </h2>
+
+<form action = "makePDF" method="POST">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" name="makePDF" value="PDF erzeugen" />
+
+
+</form>
+
+<h2> Fragen </h2>
+
+Die Klausur wird die Fragen {{ fragenliste }} beinhalten. 
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% load url from future %}
+
+
+
+{% block content %}
+
+<h2> Wählen Sie die Fragen aus </h2>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+Stufe: {{stufe }}
+<br>
+Schlagworte: {{schlagworte }}
+<br>
+
+<form action = "klausur" method="POST">
+{% csrf_token %}
+<input type="submit" name="klausur" value="Klausur erstellen" />
+{{ form.as_p }} 
+</form>
+
+{% endblock %}
