@@ -372,29 +372,5 @@ class makePDF(View):
 
         return concatProcess.returncode
 
-class testView (FormView):
-
-    template_name = "klausurensammlung/test.html"
-    form_class = forms.testForm
-    success_url = "success.html"
-
-    choices=(('a','a'),
-             ('b','b'),
-             ('c','c'),
-             ('d','d'),)
-
-    def get_initial(self):
-        print "initial", self.request.path, self.request.GET
-
-        initial = {}
-        initial['testField'] = 'a'
-        return initial
-
-
-    def form_valid(self, f):
-        print "form is valid"
-        print "selected: ", f.cleaned_data
-
-        return super(testView, self).form_valid(f)
 
 
