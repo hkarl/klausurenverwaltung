@@ -6,7 +6,7 @@ import models
 import forms
 
 # django specific: 
-import django_tables2
+# import django_tables2
 from django.shortcuts import render, redirect
 from django.views.generic import View, FormView
 from django.http import HttpResponseNotFound
