@@ -1,4 +1,4 @@
-from klausurensammlung.models import Schlagwort, Stufe, MCFrage 
+from klausurensammlung.models import Schlagwort, Stufe, MCFrage, StandardFrage
 from django.contrib import admin
 
 admin.site.register(Schlagwort)
@@ -11,5 +11,9 @@ class MCFrageAdmin (admin.ModelAdmin):
     
         ]
 
+class StandardFrageAdmin (admin.ModelAdmin):
+    pass
+
 
 admin.site.register(MCFrage, MCFrageAdmin)
+admin.site.register(StandardFrage, StandardFrageAdmin)

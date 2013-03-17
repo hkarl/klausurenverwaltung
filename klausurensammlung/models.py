@@ -26,6 +26,25 @@ class Stufe (models.Model):
 
 
 
+class StandardFrage (models.Model):
+    frage = models.TextField()
+    schlagworte = models.ManyToManyField (Schlagwort,
+                                          blank=True)
+    stufe = models.ManyToManyField (Stufe,
+                                    blank=True)
+    antwort = models.TextField()
+
+    platz = models.FloatField(verbose_name="Platz (in cm)",
+                              default = 3.0)
+
+    def __unicode__(self):
+        return "Q: %s ; A: %s" % (self.frage[:50], self.antwort[:50])
+
+
+    class Meta:
+        verbose_name = "Standard-Frage"
+        verbose_name_plural = "Standard-Fragen"
+
 class MCFrage(models.Model):
     frage = models.TextField()
     schlagworte = models.ManyToManyField (Schlagwort,

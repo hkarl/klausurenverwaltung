@@ -52,10 +52,20 @@ class schlagworte (View):
         #                                     ('b','b'),
         #                                     ('c','c'),
         #                                     ('d','d'),)
-        ff.fields['Schlagworte'].choices = ( (x['schlagworte'],
-                                              models.Schlagwort.objects.get (pk=x['schlagworte']).__unicode__())
-                                              for x in
-                                              models.MCFrage.objects.all().filter (stufe__stufe__exact = stufe).values('schlagworte').distinct())
+
+        mcSchlagwortIds = [x['schlagworte'] for x in
+                           models.MCFrage.objects.all().filter (stufe__stufe__exact = stufe).values('schlagworte').distinct()]
+        standardFrageSchlagwortIds = [x['schlagworte'] for x in
+                                      models.StandardFrage.objects.all().filter (stufe__stufe__exact = stufe).values('schlagworte').distinct()]
+
+        pp(mcSchlagwortIds)
+
+        schlagwortIds = set(mcSchlagwortIds) | set (standardFrageSchlagwortIds)
+        pp(schlagwortIds)
+        ff.fields['Schlagworte'].choices = ( (x,
+                                              models.Schlagwort.objects.get (pk=x).__unicode__())
+                                              for x in schlagwortIds
+                                              )
 
         pp (ff.fields['Schlagworte'].choices)
 
@@ -75,31 +85,43 @@ class schlagworte (View):
 
         # berechne die Fragen-IDs
         # print "fragen"
-        fragenIDs = []
+        mcfragenIDs = []
 
         for x in models.MCFrage.objects.all():
             thisQuestionSchlagwortIDs = [y.pk for y in x.schlagworte.all()]
             # print x.pk, thisQuestionSchlagwortIDs
             # print set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))
             if bool(set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))):
-                fragenIDs.append(str(x.pk))
+                mcfragenIDs.append(str(x.pk))
 
+        pp(mcfragenIDs)
 
-        pp(fragenIDs)
+        # fuer die Standardfragen versuchen wir mal eine andere Iteration:
+        print "standardfragen"
+        standardFragenIDs = set()
+        for s in schlagwortIDs:
+            # print models.Schlagwort.objects.get(pk=s)
+            qs = models.StandardFrage.objects.filter(schlagworte__id__exact = s)
+            # print set([x.id for x in qs])
+            standardFragenIDs |= set([x.id for x in qs])
+
+        standardFragenIDs = list(standardFragenIDs)
+        print standardFragenIDs
 
         # return redirect ('klausur', stufe = stufe, ids = ','.join(ids))
         # return redirect ('/klausurensammlung/klausur/%s/' %
         #                 (stufe))
-        return redirect ('/klausurensammlung/klausur/stufe=%s/sw=%s/mcfragen=%s/' %
+        return redirect ('/klausurensammlung/klausur/stufe=%s/sw=%s/stfragen=%s/mcfragen=%s/' %
                          (stufe,
                           ','.join([str(x) for x in schlagwortIDs]),
-                          ','.join(fragenIDs)))
+                          ','.join([str(x) for x in standardFragenIDs]),
+                          ','.join(mcfragenIDs)))
 
 
 
     
 class klausur(View):
-    def get (self, request, stufe, swIds, mcids):
+    def get (self, request, stufe, swIds, stids, mcids):
 
         # pp(request)
 
@@ -112,20 +134,25 @@ class klausur(View):
 
         # filtere alle Fragen nach der verlangten Stufe
         # fragen = models.MCFrage.objects.all()
-        fragen = models.MCFrage.objects.filter(stufe__stufe__exact = stufe)
+        mcfragen = models.MCFrage.objects.filter(stufe__stufe__exact = stufe)
+        stfragen = models.StandardFrage.objects.filter(stufe__stufe__exact = stufe)
 
 
-        idlist = mcids.split(',')
+        stidlist = stids.split(',')
+        mcidlist = mcids.split(',')
 
-        fragenstrings = [(x.pk, "'%s'" % x.__unicode__())
+        fragenstrings = [(x.pk, "%s" % x.__unicode__())
                          for x in
-                         fragen.filter(id__in=idlist)]
+                         mcfragen.filter(id__in=mcidlist)]
 
         pp (fragenstrings)
 
 
         ff = forms.KlausurlisteForm()
         ff.fields['mcfragenliste'].choices = fragenstrings
+        ff.fields['stfragenliste'].choices = [(x.pk, x.__unicode__() )
+                                                for x in
+                                                stfragen.filter(id__in=stidlist)]
 
         return render (request,
                 'klausurensammlung/klausurListe.html',
@@ -137,28 +164,31 @@ class klausur(View):
                  }
                 )
 
-    def post (self, request, stufe, swIds, mcids):
+    def post (self, request, stufe, swIds, stids, mcids):
         # print "klausr in post"
         # print "ids", ids
         # selectedIds = [x for x in request.POST.getlist ('fragenliste')]
         # print "selected IDs", selectedIds
 
-        return redirect ('/klausurensammlung/makePDF/%s/' % ','.join(request.POST.getlist ('mcfragenliste')))
+        return redirect ('/klausurensammlung/makePDF/st=%s/mc=%s/' %
+                         (','.join(request.POST.getlist ('stfragenliste')),
+                          ','.join(request.POST.getlist ('mcfragenliste'))))
 
 
 class makePDF(View):
 
-    def get(self, request, ids):
+    def get(self, request, stids, mcids):
         # print request.GET
 
         ff = forms.Klausurparameter
 
         return render (request,
                        'klausurensammlung/parameter.html',
-                        {'fragenliste': ids,
+                        {'stfragenliste': stids,
+                         'mcfragenliste': mcids,
                          'form': ff})
 
-    def post (self, request, ids):
+    def post (self, request, stids, mcids):
 
         print "makePDF post"
 
@@ -168,7 +198,8 @@ class makePDF(View):
             print "form not valid"
             return render (request,
                            'klausurensammlung/parameter.html',
-                           {'fragenliste': ids,
+                           {'stfragenliste': stids,
+                            'mcfragenliste': mcids,
                             'form': ff})
 
 
@@ -181,13 +212,15 @@ class makePDF(View):
         klausurBoxtext = ff.cleaned_data['klausurBoxtext']
 
         # die richtien Fragen aus der DAtenbank holen:
-        fragen = models.MCFrage.objects.filter (id__in = ids.split(','))
+        mcfragen = models.MCFrage.objects.filter (id__in = mcids.split(','))
+        stfragen = models.StandardFrage.objects.filter (id__in = stids.split(','))
 
-        pp ([x.frage for x in fragen])
+        pp ([x.frage for x in mcfragen])
         # write questions.tex
 
+        # hier die MC-Fragen
         questionsList = []
-        for x in fragen:
+        for x in mcfragen:
             falscheAntwort = ""
             # check the wrong ansers
             if x.falscheantwort1:
@@ -209,11 +242,24 @@ class makePDF(View):
 %s\end{checkboxes}
 """  % ( x.frage, x.richtigeAntwort, falscheAntwort))
 
+
+        # und hier die STandardfragen
+        for x in stfragen:
+            questionsList.append(r"""
+\question {0:s}
+\\begin{{solutionorlines}}[{1:s}cm]
+{2:s}
+\\end{{solutionorlines}}
+""".format(x.frage, str(x.platz), x.antwort))
+
+
         questions = r"""
 \\begin{questions}
 %s
 \end{questions}
 """ %  '\n'.join(questionsList)
+
+
 
         # print questions
         # print settings.LATEXDIR

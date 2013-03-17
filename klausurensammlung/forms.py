@@ -32,7 +32,11 @@ class schlagworteForm (forms.Form):
 
 
 class KlausurlisteForm (forms.Form):
-    mcfragenliste = forms.MultipleChoiceField (label="Welche Multiple-Choice Fragen in die Klausur aufnehmen?",
+    stfragenliste =  forms.MultipleChoiceField (label="Welche Standardfragen in die Klausur aufnehmen?",
+                                               choices = [],
+                                               widget = forms.widgets.CheckboxSelectMultiple())
+
+    mcfragenliste = forms.MultipleChoiceField (label="Welche Multiple-Choice-Fragen in die Klausur aufnehmen?",
                                              choices = [],
                                              widget = forms.widgets.CheckboxSelectMultiple())
 
