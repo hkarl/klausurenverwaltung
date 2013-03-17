@@ -147,21 +147,23 @@ class klausur(View):
         stfragen = models.StandardFrage.objects.filter(stufe__stufe__exact = stufe)
 
 
-        stidlist = stids.split(',')
-        mcidlist = mcids.split(',')
-
-        fragenstrings = [(x.pk, "%s" % x.__unicode__())
-                         for x in
-                         mcfragen.filter(id__in=mcidlist)]
-
-        # pp (fragenstrings)
-
-
+        # fill in the form
         ff = forms.KlausurlisteForm()
-        ff.fields['mcfragenliste'].choices = fragenstrings
-        ff.fields['stfragenliste'].choices = [(x.pk, x.__unicode__() )
-                                                for x in
-                                                stfragen.filter(id__in=stidlist)]
+
+        # mc fragen:
+        if mcids:
+            mcidlist = mcids.split(',')
+            fragenstrings = [(x.pk, "%s" % x.__unicode__())
+                             for x in
+                             mcfragen.filter(id__in=mcidlist)]
+            ff.fields['mcfragenliste'].choices = fragenstrings
+
+        # standardfragen
+        if stids:
+            stidlist = stids.split(',')
+            ff.fields['stfragenliste'].choices = [(x.pk, x.__unicode__() )
+                                                    for x in
+                                                    stfragen.filter(id__in=stidlist)]
 
         return render (request,
                 'klausurensammlung/klausurListe.html',
