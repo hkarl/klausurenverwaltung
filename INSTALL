@@ -79,6 +79,10 @@ the right with the right arrow; click "Sichern" )
  as well - your choice! )
 
 
+- to generate the PDF files, you need a reasonably new LaTeX installation, e.g. TeXLive 2011
+(2010 probably works as well). Sometimes, the exam package is too old; simply updated
+ this file if necessary.
+
 
 TODO: make this work under an apache installation!!
 
