@@ -9,6 +9,7 @@ class Schlagwort(models.Model):
     schlagwort = models.CharField(max_length=200)
 
     class Meta:
+        ordering = ['schlagwort']
 	verbose_name_plural = "Schlagworte"
 
     def __unicode__ (self):
@@ -19,6 +20,7 @@ class Stufe (models.Model):
 			     max_length=10)
 
     class Meta:
+        ordering = ['stufe']
 	verbose_name_plural = "Stufen"
 
     def __unicode__ (self):
@@ -44,6 +46,7 @@ class StandardFrage (models.Model):
     class Meta:
         verbose_name = "Standard-Frage"
         verbose_name_plural = "Standard-Fragen"
+        ordering = ['frage']
 
 class MCFrage(models.Model):
     frage = models.TextField()
@@ -60,7 +63,8 @@ class MCFrage(models.Model):
 
     class Meta:
 	verbose_name_plural = "Multiple-Choice-Fragen"
-	verbose_name = "Multiple-Choice-Frage" 
+	verbose_name = "Multiple-Choice-Frage"
+        ordering = ['frage']
 
     def __unicode__ (self):
         return self.frage 
