@@ -223,31 +223,31 @@ class makePDF(View):
         klausurLaufendeNummer = ff.cleaned_data['klausurLaufendeNummer']
         klausurBoxtext = ff.cleaned_data['klausurBoxtext']
 
-        # die richtien Fragen aus der DAtenbank holen:
-        mcfragen = models.MCFrage.objects.filter (id__in = mcids.split(','))
-        stfragen = models.StandardFrage.objects.filter (id__in = stids.split(','))
 
         # pp ([x.frage for x in mcfragen])
+        questionsList = []
         # write questions.tex
 
         # hier die MC-Fragen
-        questionsList = []
-        for x in mcfragen:
-            falscheAntwort = ""
-            # check the wrong ansers
-            if x.falscheantwort1:
-                falscheAntwort += r"\choice " + x.falscheantwort1 + "\n"
-            if x.falscheantwort2:
-                falscheAntwort += r"\choice " + x.falscheantwort2 + "\n"
-            if x.falscheantwort3:
-                falscheAntwort += r"\choice " + x.falscheantwort3 + "\n"
-            if x.falscheantwort4:
-                falscheAntwort += r"\choice " + x.falscheantwort4 + "\n"
-            if x.falscheantwort5:
-                falscheAntwort += r"\choice " + x.falscheantwort5 + "\n"
+        # die richtien Fragen aus der DAtenbank holen:
+        if mcids:
+            mcfragen = models.MCFrage.objects.filter (id__in = mcids.split(','))
+            for x in mcfragen:
+                falscheAntwort = ""
+                # check the wrong ansers
+                if x.falscheantwort1:
+                    falscheAntwort += r"\choice " + x.falscheantwort1 + "\n"
+                if x.falscheantwort2:
+                    falscheAntwort += r"\choice " + x.falscheantwort2 + "\n"
+                if x.falscheantwort3:
+                    falscheAntwort += r"\choice " + x.falscheantwort3 + "\n"
+                if x.falscheantwort4:
+                    falscheAntwort += r"\choice " + x.falscheantwort4 + "\n"
+                if x.falscheantwort5:
+                    falscheAntwort += r"\choice " + x.falscheantwort5 + "\n"
 
 
-            questionsList.append(r"""
+                questionsList.append(r"""
 \question %s
 \\begin{checkboxes}
 \CorrectChoice %s
@@ -256,9 +256,11 @@ class makePDF(View):
 
 
         # und hier die STandardfragen
-        for x in stfragen:
-            print type(x.antwort)
-            questionsList.append(ur"""
+        if stids:
+            stfragen = models.StandardFrage.objects.filter (id__in = stids.split(','))
+            for x in stfragen:
+                print type(x.antwort)
+                questionsList.append(ur"""
 \question {0:s}
 \\begin{{solutionorlines}}[{1:s}cm]
 {2:s}
