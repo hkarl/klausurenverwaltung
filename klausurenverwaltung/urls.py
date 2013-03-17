@@ -5,7 +5,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+
     url(r'^$', 'klausurenverwaltung.views.home', name='home'),
     # url(r'^klausurenverwaltung/', include('klausurenverwaltung.foo.urls')),
 

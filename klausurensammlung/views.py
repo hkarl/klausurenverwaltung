@@ -15,6 +15,9 @@ from django.forms.models import modelformset_factory
 from django.db.models import Q
 from django.conf import settings
 
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 # basic python infrastrtucture
 from pprint import pprint as pp 
@@ -37,13 +40,17 @@ class stufe(FormView):
         print "stufe is valid"
         self.stufe  = form.cleaned_data['Stufe']
         return super(stufe, self).form_valid(form)
-        
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(stufe, self).dispatch(*args, **kwargs)
 
 class schlagworte (View):
     """
     Present the schlageworte multiple choice using a standard view, not the complex mixin FormView
     """
 
+    @method_decorator (login_required)
     def get (self, request, stufe):
         print "in get", stufe
 
@@ -74,6 +81,7 @@ class schlagworte (View):
                         {'form': ff})
 
 
+    @method_decorator (login_required)
     def post (self, request, stufe):
         # print 'in post', stufe
         # print request.POST
@@ -121,6 +129,7 @@ class schlagworte (View):
 
     
 class klausur(View):
+    @method_decorator (login_required)
     def get (self, request, stufe, swIds, stids, mcids):
 
         # pp(request)
@@ -164,6 +173,7 @@ class klausur(View):
                  }
                 )
 
+    @method_decorator (login_required)
     def post (self, request, stufe, swIds, stids, mcids):
         # print "klausr in post"
         # print "ids", ids
@@ -177,6 +187,7 @@ class klausur(View):
 
 class makePDF(View):
 
+    @method_decorator (login_required)
     def get(self, request, stids, mcids):
         # print request.GET
 
@@ -188,6 +199,7 @@ class makePDF(View):
                          'mcfragenliste': mcids,
                          'form': ff})
 
+    @method_decorator (login_required)
     def post (self, request, stids, mcids):
 
         print "makePDF post"
