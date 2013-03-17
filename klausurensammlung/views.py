@@ -33,11 +33,11 @@ class stufe(FormView):
     def get_success_url (self):
         target = stufe.success_url + "stufe=" + self.stufe + "/"
         target = stufe.success_url + self.stufe + "/"
-        print "target in stufe: ", target
+        # print "target in stufe: ", target
         return target
 
     def form_valid (self, form):
-        print "stufe is valid"
+        # print "stufe is valid"
         self.stufe  = form.cleaned_data['Stufe']
         return super(stufe, self).form_valid(form)
 
@@ -52,7 +52,7 @@ class schlagworte (View):
 
     @method_decorator (login_required)
     def get (self, request, stufe):
-        print "in get", stufe
+        # print "in get", stufe
 
         ff = forms.schlagworteForm ()
         # ff.fields['Schlagworte'].choices = (('a','a'),
@@ -65,16 +65,16 @@ class schlagworte (View):
         standardFrageSchlagwortIds = [x['schlagworte'] for x in
                                       models.StandardFrage.objects.all().filter (stufe__stufe__exact = stufe).values('schlagworte').distinct()]
 
-        pp(mcSchlagwortIds)
+        # pp(mcSchlagwortIds)
 
         schlagwortIds = set(mcSchlagwortIds) | set (standardFrageSchlagwortIds)
-        pp(schlagwortIds)
+        # pp(schlagwortIds)
         ff.fields['Schlagworte'].choices = ( (x,
                                               models.Schlagwort.objects.get (pk=x).__unicode__())
                                               for x in schlagwortIds
                                               )
 
-        pp (ff.fields['Schlagworte'].choices)
+        # pp (ff.fields['Schlagworte'].choices)
 
         return render (request,
                        'klausurensammlung/schlagworte.html',
@@ -102,10 +102,10 @@ class schlagworte (View):
             if bool(set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))):
                 mcfragenIDs.append(str(x.pk))
 
-        pp(mcfragenIDs)
+        # pp(mcfragenIDs)
 
         # fuer die Standardfragen versuchen wir mal eine andere Iteration:
-        print "standardfragen"
+        # print "standardfragen"
         standardFragenIDs = set()
         for s in schlagwortIDs:
             # print models.Schlagwort.objects.get(pk=s)
@@ -114,7 +114,7 @@ class schlagworte (View):
             standardFragenIDs |= set([x.id for x in qs])
 
         standardFragenIDs = list(standardFragenIDs)
-        print standardFragenIDs
+        # print standardFragenIDs
 
         # return redirect ('klausur', stufe = stufe, ids = ','.join(ids))
         # return redirect ('/klausurensammlung/klausur/%s/' %
@@ -136,9 +136,9 @@ class klausur(View):
 
         ## pp (request.GET)
 
-        print "in klausur get"
-        print mcids.split(',')
-        print swIds
+        # print "in klausur get"
+        # print mcids.split(',')
+        # print swIds
 
 
         # filtere alle Fragen nach der verlangten Stufe
@@ -154,7 +154,7 @@ class klausur(View):
                          for x in
                          mcfragen.filter(id__in=mcidlist)]
 
-        pp (fragenstrings)
+        # pp (fragenstrings)
 
 
         ff = forms.KlausurlisteForm()
@@ -202,12 +202,12 @@ class makePDF(View):
     @method_decorator (login_required)
     def post (self, request, stids, mcids):
 
-        print "makePDF post"
+        # print "makePDF post"
 
         ff = forms.Klausurparameter(request.POST)
 
         if not ff.is_valid():
-            print "form not valid"
+            # print "form not valid"
             return render (request,
                            'klausurensammlung/parameter.html',
                            {'stfragenliste': stids,
@@ -227,7 +227,7 @@ class makePDF(View):
         mcfragen = models.MCFrage.objects.filter (id__in = mcids.split(','))
         stfragen = models.StandardFrage.objects.filter (id__in = stids.split(','))
 
-        pp ([x.frage for x in mcfragen])
+        # pp ([x.frage for x in mcfragen])
         # write questions.tex
 
         # hier die MC-Fragen
@@ -257,7 +257,8 @@ class makePDF(View):
 
         # und hier die STandardfragen
         for x in stfragen:
-            questionsList.append(r"""
+            print type(x.antwort)
+            questionsList.append(ur"""
 \question {0:s}
 \\begin{{solutionorlines}}[{1:s}cm]
 {2:s}
@@ -265,7 +266,7 @@ class makePDF(View):
 """.format(x.frage, str(x.platz), x.antwort))
 
 
-        questions = r"""
+        questions = ur"""
 \\begin{questions}
 %s
 \end{questions}
@@ -312,9 +313,9 @@ class makePDF(View):
         # run permuter on it
         permuterOut = open (os.path.join(settings.LATEXDIR, 'permuter.out'), 'w')
         permuterErr = open (os.path.join(settings.LATEXDIR, 'permuter.err'), 'w')
-        print os.getcwd()
-        print os.path.join(settings.BINDIR, settings.PERMUTER)
-        print settings.LATEXDIR
+        # print os.getcwd()
+        # print os.path.join(settings.BINDIR, settings.PERMUTER)
+        # print settings.LATEXDIR
         permuterProcess  = subprocess.Popen ([os.path.join(os.getcwd(),
                                                    settings.BINDIR,
                                                    settings.PERMUTER),
