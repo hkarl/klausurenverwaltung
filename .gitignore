@@ -3,6 +3,9 @@
 # C extensions
 *.so
 
+# Latex needed here 
+#latex
+
 # Packages
 *.egg
 *.egg-info
@@ -10,7 +13,7 @@ dist
 build
 eggs
 parts
-bin
+# bin
 var
 sdist
 develop-eggs

@@ -1,0 +1,65 @@
+\documentclass[addpoints,12pt]{exam}
+% \documentclass[answers,addpoints,12pt]{exam}
+
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+
+\input{header}
+
+\renewcommand{\solutiontitle}{\noindent\textbf{Lösung:}\enspace}
+\shadedsolutions 
+\definecolor{SolutionColor}{rgb}{0.8,0.9,1}
+
+\pagestyle{head}
+\runningheadrule
+\firstpageheader{\klausurfach}{\klausurnummer}{\klausurdatum}
+\runningheader{\klausurfach}
+              {\klausurnummer, Seite \thepage\ von \numpages}
+              {\klausurdatum}
+
+\pointpoints{\,Punkt}{\,Punkte}
+ 
+
+\hqword{Fragen: }
+\hpword{Punkte: }
+\hpgword{Seite: }
+\htword{Gesamt }
+\hsword{Erreicht: }
+
+
+
+\begin{document}
+
+\ifdefined\loesung
+  \printanswers
+\fi 
+
+\begin{center}
+\fbox{\fbox{\parbox{5.5in}{\centering
+\boxtext}}}
+\end{center}
+
+\vspace{0.1in}
+\makebox[\textwidth]{Name:\enspace\hrulefill}
+
+\pointsinrightmargin
+  
+
+\input{questions}
+
+ 
+
+% \ref\hrule
+% \vspace{0.1cm}
+% \noindent Der Test besteht aus \numquestions{} Fragen, bei denen insgesamt
+% \numpoints{} Punkte erreicht werden können. 
+
+ 
+
+
+% \begin{center}
+%   \gradetable[h][questions]
+% \end{center}
+
+\end{document}
