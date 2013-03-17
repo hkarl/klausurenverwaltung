@@ -1,0 +1,91 @@
+INSTALL notes
+-------------
+
+For OSX
+-------
+
+- python, sufficiently new (used 2.7.2 in development); must be in path
+
+- install pip:
+$ sudo easy_install pip
+
+ (easy_install comes with python)
+
+(leaving out virtualenv on account of lacking experience on my part...)
+
+- install django
+
+$ sudo pip install Django
+
+- install django-select2
+
+$ sudo pip install django_select2
+
+- highly recommended: install GIT  - http://git-scm.com/download/mac
+ (standard MAC installation practice; should be easy to install on Linux as well)
+
+
+- install pdftk: http://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/
+
+(it should be installed in /usr/local/bin, if not, we have to adapt p
+
+
+- in terminal, go to a path where you'D like the web application to live. E.g., ~/bin
+
+- clone the git repository:
+$ git clone git://github.com/hkarl/klausurenverwaltung.git
+
+(this is read-only, talk to Holger if you want write-access to the repository as well)
+
+- change into the newly created directory
+$ cd klausurenverwaltung
+
+- check that pdftk is in the right place:
+$ which pdftk
+
+It should print: /usr/local/bin/pdftk
+
+if not, change the pdftk entry in file klausurenverwaltung/settings.py (at the very end)
+
+
+- syncrhonize the database and create a master user for it:
+
+$ python manage.py syncdb
+
+(answer the question appropriately, think of a username and a secure password! don't forget the password!)
+
+
+- start the web application:
+
+$ python manage.py runserver
+
+this will only allow access from the local machine. For world-wide access, run it as:
+
+$ python manage.py runserver 0.0.0.0:8000
+
+(listening on port 8000, might need corresponding rule in firewall to allow access)
+
+- log in as master user and create "normal" accounts , possibly restricting access rights
+
+- with webbrowser, open 127.0.0.1:8000
+- login in with account /password just created
+- Click on Benutzer -> Hinzufügen
+- Add name and password for standard user
+- in the following page, add other inofmration and - important!
+-- set the "Redakteur" flag !
+-- add ONLY the Berechtigungen that start with "klausurensammlung" (mark them in the list at the end, and push them to
+the right with the right arrow; click "Sichern" )
+(if you trust that user not to create chaos, feel free to add the other Berechtigungen a
+ as well - your choice! )
+
+
+
+TODO: make this work under an apache installation!!
+
+
+
+
+
+
+
+
