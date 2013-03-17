@@ -11,6 +11,6 @@ urlpatterns = patterns('',
                        url(r'^schlagworte/stufe=(?P<stufe>[a-zA-Z\-0-9]+)/', views.schlagworte.as_view(), name='schlagworte'),
                        # url(r'klausur/(?P<stufe>[a-zA-Z\-0-9]+)/', views.klausur.as_view(), name='klausur'),
                        # url(r'klausur/', views.klausur.as_view(), name='klausur'),
-                       url(r'^klausur/stufe=(?P<stufe>[a-zA-Z\-0-9]+)/sw=(?P<swIds>[^/]+)/fragen=(?P<ids>[^/]+)/', views.klausur.as_view(), name='klausur'),
+                       url(r'^klausur/stufe=(?P<stufe>[a-zA-Z\-0-9]+)/sw=(?P<swIds>[^/]+)/mcfragen=(?P<mcids>[^/]+)/', views.klausur.as_view(), name='klausur'),
                        url(r'^makePDF/(?P<ids>[^/]+)', views.makePDF.as_view(), name='makePDF'),
                        )

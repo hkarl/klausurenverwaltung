@@ -1,69 +1,38 @@
 # -*- coding: utf-8 -*-
 from django import forms
 import models
-
+from django_select2.fields import Select2MultipleChoiceField, Select2ChoiceField
+from django_select2.widgets import Select2MultipleWidget, Select2Widget
 
 # basic python infrastrtucture
 from pprint import pprint as pp 
 
 class stufeForm (forms.Form):
-    Stufe = forms.fields.ChoiceField (choices=sorted([(x.stufe, x.__unicode__())
+    # Stufe = forms.fields.ChoiceField (choices=sorted([(x.stufe, x.__unicode__())
+    #                                                   for x in models.Stufe.objects.all() ]),
+    #                                   required=True)
+    Stufe = Select2ChoiceField (choices=sorted([(x.stufe, x.__unicode__())
                                                       for x in models.Stufe.objects.all() ]),
-                                                      required=True)
+                                widget=Select2Widget(select2_options={'minimumResultsForSearch': 2,
+                                                                      'width': u'resolve',
+                                                                      'allowClear': 'true',
+                                                                      }),
+                                      required=True)
 
 
 class schlagworteForm (forms.Form):
 
-    Schlagworte = forms.fields.MultipleChoiceField (
-        ## choices =
-        ##                                     [(x.id, x.__unicode__())
-        ##                                      for x in models.Schlagwort.objects.all()],
-                                            widget=forms.CheckboxSelectMultiple)
+    # Schlagworte = forms.fields.MultipleChoiceField ( )
+    Schlagworte = Select2MultipleChoiceField (widget=Select2MultipleWidget(select2_options={'minimumResultsForSearch': 2,
+                                                                                            'width': u'resolve',
+                                                                                            'allowClear': 'true',
+                                                                                            }) )
 
 
-    # def is_valid(self):
-    #     print "SchlagworteForm is_valid"
-    #     print self.data['Schlagworte']
-    #     pp (self.is_bound)
-    #     pp (self.errors)
-    #     pp (self._errors)
-    #     res = super (schlagworteForm, self).is_valid()
-    #     print "res in is_valid:", res
-    #     pp (self.is_bound)
-    #     pp (self.errors)
-    #     pp (self._errors)
-    #     if res:
-    #         print "further checking"
-    #         print self.cleaned_data
-    #
-    #     return res
-        
-
-    ## def narrowSchlagworte(self):
-    ##     print "narrowSchlagworte:"
-    ##     pp(self.cleaned_data) 
-    ##     if ((not (self.cleaned_data['Stufe'] == '-1' or
-    ##               self.cleaned_data['Stufe'] == ''
-    ##              )) and
-    ##         (self.cleaned_data['Schlagworte'] ==  [])):
-    ##         print "reselect schlagworte"
-    ##         # find all Schlagworte that appear in Klausuren that have the corresponding class
-    ##         qsKlausuren = models.MCFrage.objects.all().filter (stufe__stufe__exact =
-    ##                                              self.cleaned_data['Stufe'])
-
-    ##         schlagw = qsKlausuren.values('schlagworte').distinct()
-    ##         pp (qsKlausuren.all())
-    ##         pp (schlagw.all())
-            
-            
-    ##         self.fields['Schlagworte'].choices = [ (x['schlagworte'],
-    ##                                                 models.Schlagwort.objects.get (pk=x['schlagworte']).schlagwort)
-    ##                                                 for x in schlagw.all()]
-    ##     print "----"
 
 
 class KlausurlisteForm (forms.Form):
-    fragenliste = forms.MultipleChoiceField (label="Welche Fragen in die Klausur aufnehmen?",
+    mcfragenliste = forms.MultipleChoiceField (label="Welche Multiple-Choice Fragen in die Klausur aufnehmen?",
                                              choices = [],
                                              widget = forms.widgets.CheckboxSelectMultiple())
 

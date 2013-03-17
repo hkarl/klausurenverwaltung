@@ -90,7 +90,7 @@ class schlagworte (View):
         # return redirect ('klausur', stufe = stufe, ids = ','.join(ids))
         # return redirect ('/klausurensammlung/klausur/%s/' %
         #                 (stufe))
-        return redirect ('/klausurensammlung/klausur/stufe=%s/sw=%s/fragen=%s/' %
+        return redirect ('/klausurensammlung/klausur/stufe=%s/sw=%s/mcfragen=%s/' %
                          (stufe,
                           ','.join([str(x) for x in schlagwortIDs]),
                           ','.join(fragenIDs)))
@@ -99,14 +99,14 @@ class schlagworte (View):
 
     
 class klausur(View):
-    def get (self, request, stufe, swIds, ids):
+    def get (self, request, stufe, swIds, mcids):
 
         # pp(request)
 
         ## pp (request.GET)
 
         print "in klausur get"
-        print ids.split(',')
+        print mcids.split(',')
         print swIds
 
 
@@ -115,7 +115,7 @@ class klausur(View):
         fragen = models.MCFrage.objects.filter(stufe__stufe__exact = stufe)
 
 
-        idlist = ids.split(',')
+        idlist = mcids.split(',')
 
         fragenstrings = [(x.pk, "'%s'" % x.__unicode__())
                          for x in
@@ -125,7 +125,7 @@ class klausur(View):
 
 
         ff = forms.KlausurlisteForm()
-        ff.fields['fragenliste'].choices = fragenstrings
+        ff.fields['mcfragenliste'].choices = fragenstrings
 
         return render (request,
                 'klausurensammlung/klausurListe.html',
@@ -137,13 +137,13 @@ class klausur(View):
                  }
                 )
 
-    def post (self, request, stufe, swIds, ids):
+    def post (self, request, stufe, swIds, mcids):
         # print "klausr in post"
         # print "ids", ids
         # selectedIds = [x for x in request.POST.getlist ('fragenliste')]
         # print "selected IDs", selectedIds
 
-        return redirect ('/klausurensammlung/makePDF/%s/' % ','.join(request.POST.getlist ('fragenliste')))
+        return redirect ('/klausurensammlung/makePDF/%s/' % ','.join(request.POST.getlist ('mcfragenliste')))
 
 
 class makePDF(View):

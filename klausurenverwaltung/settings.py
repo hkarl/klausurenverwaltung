@@ -73,6 +73,7 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join (APPLICATION_DIR, "..", "latex"),
+    os.path.join (APPLICATION_DIR, "..", "klausurensammlung", "media"),
 )
 
 # print STATICFILES_DIRS
@@ -127,7 +128,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'django_tables2',
-    'klausurensammlung', 
+    'django_select2',
+    'klausurensammlung',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
