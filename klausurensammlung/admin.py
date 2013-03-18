@@ -15,12 +15,22 @@ class MCFrageAdmin (admin.ModelAdmin):
     formfield_overrides = {
         models.ManyToManyField: {'widget': Select2MultipleWidget}
     }
+    list_filter = ['stufe__stufe']
+    search_fields = ['frage', 'richtigeAntwort',
+                     'falscheantwort1',
+                     'falscheantwort2',
+                     'falscheantwort3',
+                     'falscheantwort4',
+                     'falscheantwort5',
+                     'schlagworte__schlagwort']
 
 
 class StandardFrageAdmin (admin.ModelAdmin):
     formfield_overrides = {
         models.ManyToManyField: {'widget': Select2MultipleWidget}
     }
+    list_filter = ['stufe__stufe']
+    search_fields = ['frage', 'antwort', 'schlagworte__schlagwort']
     pass
 
 

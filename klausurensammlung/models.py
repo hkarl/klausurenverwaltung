@@ -61,6 +61,10 @@ class MCFrage(models.Model):
     falscheantwort4 = models.TextField(blank=True)
     falscheantwort5 = models.TextField(blank=True)
 
+    def __unicode__(self):
+        return "Q: %s ; A: %s" % (self.frage[:50], self.richtigeAntwort[:50])
+
+
     class Meta:
 	verbose_name_plural = "Multiple-Choice-Fragen"
 	verbose_name = "Multiple-Choice-Frage"
