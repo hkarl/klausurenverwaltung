@@ -30,9 +30,6 @@ $ sudo pip install django_select2
 
 - install pdftk: http://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/
 
-(it should be installed in /usr/local/bin, if not, we have to adapt p
-
-
 - in terminal, go to a path where you'D like the web application to live. E.g., ~/bin
 
 - clone the git repository:
