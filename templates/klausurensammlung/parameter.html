@@ -1,7 +1,24 @@
 {% extends "admin/base_site.html" %}
 {% load url from future %}
+{% load staticfiles %}
 
 
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        $(function() {
+            $( "#id_klausurDatum" ).datepicker({
+                showButtonPanel: true,
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-5:+20",
+                showOn: "button",
+                buttonImage: "{% static 'jquery/development-bundle/demos/images/calendar.gif' %}",
+                buttonImageOnly: true});
+        });
+    </script>
+
+{% endblock %}
 
 {% block content %}
 
