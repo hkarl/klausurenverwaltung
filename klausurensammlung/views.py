@@ -294,7 +294,7 @@ class makePDF(View):
 \\newcommand{\klausurfach}{%s}
 \\newcommand{\klausurnummer}{%s}
 \\newcommand{\\boxtext}{%s}
-        """ % (klausurDatum, klausurFach, klausurLaufendeNummer,
+        """ % (klausurDatum.strftime('%d.%m.%Y'), klausurFach, klausurLaufendeNummer,
                 klausurBoxtext)
 
         fp = open (os.path.join(settings.LATEXDIR, "header.tex"), 'w')
