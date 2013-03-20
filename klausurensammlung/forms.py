@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 import models
-from django_select2.fields import Select2MultipleChoiceField, Select2ChoiceField
+from django_select2.fields import Select2MultipleChoiceField, Select2ChoiceField, ModelSelect2Field
 from django_select2.widgets import Select2MultipleWidget, Select2Widget
 
 # basic python infrastrtucture
@@ -11,13 +11,15 @@ class stufeForm (forms.Form):
     # Stufe = forms.fields.ChoiceField (choices=sorted([(x.stufe, x.__unicode__())
     #                                                   for x in models.Stufe.objects.all() ]),
     #                                   required=True)
-    Stufe = Select2ChoiceField (choices=sorted([(x.stufe, x.__unicode__())
-                                                      for x in models.Stufe.objects.all() ]),
-                                widget=Select2Widget(select2_options={'minimumResultsForSearch': 2,
-                                                                      'width': u'resolve',
-                                                                      'allowClear': 'true',
-                                                                      }),
-                                      required=True)
+    # Stufe = Select2ChoiceField (choices=sorted([(x.stufe, x.__unicode__())
+    #                                                   for x in models.Stufe.objects.all() ]),
+    #                             widget=Select2Widget(select2_options={'minimumResultsForSearch': 2,
+    #                                                                   'width': u'resolve',
+    #                                                                   'allowClear': 'true',
+    #                                                                   }),
+    #                                   required=True)
+
+    Stufe = ModelSelect2Field  (queryset=models.Stufe.objects.all(), required=True)
 
 
 class schlagworteForm (forms.Form):

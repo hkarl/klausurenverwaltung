@@ -31,8 +31,9 @@ class stufe(FormView):
     success_url = "/klausurensammlung/schlagworte/stufe="
         
     def get_success_url (self):
-        target = stufe.success_url + "stufe=" + self.stufe + "/"
-        target = stufe.success_url + self.stufe + "/"
+        # target = stufe.success_url + "stufe=" + self.stufe + "/"
+
+        target = stufe.success_url + str(self.stufe.stufe) + "/"
         # print "target in stufe: ", target
         return target
 
