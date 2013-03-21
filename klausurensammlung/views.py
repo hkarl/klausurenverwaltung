@@ -91,30 +91,40 @@ class schlagworte (View):
 
         schlagwortIDs = [int(x) for x in ids]
         # print schlagwortIDs
+        # Note: interpret empty schlagwortIDs to mean "all questions for this stufe"
 
         # berechne die Fragen-IDs
         # print "fragen"
         mcfragenIDs = []
 
-        for x in models.MCFrage.objects.all():
-            thisQuestionSchlagwortIDs = [y.pk for y in x.schlagworte.all()]
-            # print x.pk, thisQuestionSchlagwortIDs
-            # print set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))
-            if bool(set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))):
-                mcfragenIDs.append(str(x.pk))
+        if schlagwortIDs:
+            for x in models.MCFrage.objects.all():
+                thisQuestionSchlagwortIDs = [y.pk for y in x.schlagworte.all()]
+                # print x.pk, thisQuestionSchlagwortIDs
+                # print set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))
+                if bool(set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))):
+                    mcfragenIDs.append(str(x.pk))
+        else:
+            mcfragenIDs = [str(x.pk) for x in models.MCFrage.objects.filter(stufe__stufe__exact = stufe)]
 
         # pp(mcfragenIDs)
 
         # fuer die Standardfragen versuchen wir mal eine andere Iteration:
         # print "standardfragen"
-        standardFragenIDs = set()
-        for s in schlagwortIDs:
-            # print models.Schlagwort.objects.get(pk=s)
-            qs = models.StandardFrage.objects.filter(schlagworte__id__exact = s)
-            # print set([x.id for x in qs])
-            standardFragenIDs |= set([x.id for x in qs])
+        if schlagwortIDs:
+            standardFragenIDs = set()
+            for s in schlagwortIDs:
+                # print models.Schlagwort.objects.get(pk=s)
+                qs = models.StandardFrage.objects.filter(schlagworte__id__exact = s)
+                # print set([x.id for x in qs])
+                standardFragenIDs |= set([x.id for x in qs])
 
-        standardFragenIDs = list(standardFragenIDs)
+            standardFragenIDs = list(standardFragenIDs)
+        else:
+            standardFragenIDs = [x.pk for x in
+                                 models.StandardFrage.objects.all().filter (stufe__stufe__exact = stufe)
+                                 ]
+
         # print standardFragenIDs
 
         # return redirect ('klausur', stufe = stufe, ids = ','.join(ids))
@@ -172,7 +182,8 @@ class klausur(View):
                  'stufe': stufe,
                  'schlagworte': ', '.join([x.__unicode__()
                                  for x in models.Schlagwort.objects.filter(id__in =
-                                    swIds.split(','))]),
+                                    swIds.split(','))])
+                                if swIds else '',
                  }
                 )
 
