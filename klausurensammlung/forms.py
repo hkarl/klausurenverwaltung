@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 import models
-from django_select2.fields import Select2MultipleChoiceField, Select2ChoiceField, ModelSelect2Field
+from django_select2.fields import Select2MultipleChoiceField, Select2ChoiceField, ModelSelect2Field, ModelSelect2MultipleField
 from django_select2.widgets import Select2MultipleWidget, Select2Widget
 
 # basic python infrastrtucture
@@ -53,9 +53,25 @@ class Klausurparameter (forms.Form):
                                      widget=forms.Textarea,
                                      initial="Kreuze die korrekte Lösung an. Es gibt für jede Frage nur eine korrekte Lösung.")
 
-class testForm (forms.Form):
-    """
-    This is only for testing
-    """
 
-    testField = forms.fields.MultipleChoiceField()
+
+class filtertab (forms.Form):
+    Stufe = ModelSelect2Field  (queryset=models.Stufe.objects.all(), required=False)
+    # Schlagworte = Select2MultipleChoiceField (widget=Select2MultipleWidget(select2_options={'minimumResultsForSearch': 2,
+    #                                                                                         'width': u'resolve',
+    #                                                                                         'allowClear': 'true',
+    #                                                                                         }) )
+    Schlagworte = ModelSelect2MultipleField (queryset=models.Schlagwort.objects.all(),
+                                             required=False)
+
+    stfragenliste =  ModelSelect2MultipleField (queryset= models.StandardFrage.objects.all(),
+                                                label="Welche Standardfragen in die Klausur aufnehmen?",
+                                                choices = [],
+                                                widget = forms.widgets.CheckboxSelectMultiple(),
+                                                required=False)
+
+    mcfragenliste = ModelSelect2MultipleField (queryset= models.MCFrage.objects.all(),
+                                               label="Welche Multiple-Choice-Fragen in die Klausur aufnehmen?",
+                                               choices = [],
+                                               widget = forms.widgets.CheckboxSelectMultiple(),
+                                               required=False)

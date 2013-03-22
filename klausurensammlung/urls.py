@@ -7,6 +7,7 @@ from klausurensammlung import views
 
 urlpatterns = patterns('',
                        url(r'^stufe', views.stufe.as_view(), name='stufe'),
+                       url(r'^filtertab', views.filtertab.as_view(), name='filtertab'),
                        url(r'^schlagworte/stufe=(?P<stufe>[a-zA-Z\-0-9]+)/', views.schlagworte.as_view(), name='schlagworte'),
                        # url(r'klausur/(?P<stufe>[a-zA-Z\-0-9]+)/', views.klausur.as_view(), name='klausur'),
                        # url(r'klausur/', views.klausur.as_view(), name='klausur'),

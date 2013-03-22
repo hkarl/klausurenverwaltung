@@ -25,6 +25,64 @@ import codecs, os, subprocess
 
 
 
+###########
+# generic helper functions
+
+
+def getSchlagwortIdsFromStufe (stufe):
+    """
+    stufe: needs to be the actual field value. TODO: rewrite to ID
+    """
+
+    print stufe
+
+    mcSchlagwortIds = [x['schlagworte'] for x in
+                       models.MCFrage.objects.filter (stufe__stufe__exact = stufe).values('schlagworte').distinct()]
+    standardFrageSchlagwortIds = [x['schlagworte'] for x in
+                                  models.StandardFrage.objects.all().filter (stufe__stufe__exact = stufe).values('schlagworte').distinct()]
+
+    # pp(mcSchlagwortIds)
+
+    schlagwortIds = set(mcSchlagwortIds) | set (standardFrageSchlagwortIds)
+
+    return schlagwortIds
+
+
+def getQuestionIdsFromSchlagwortIDs (schlagwortIDs):
+    mcfragenIDs = []
+
+    if schlagwortIDs:
+        for x in models.MCFrage.objects.all():
+            thisQuestionSchlagwortIDs = [y.pk for y in x.schlagworte.all()]
+            # print x.pk, thisQuestionSchlagwortIDs
+            # print set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))
+            if bool(set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))):
+                mcfragenIDs.append(x.pk)
+    else:
+        mcfragenIDs = [x.pk for x in models.MCFrage.objects.filter(stufe__stufe__exact = stufe)]
+
+    # pp(mcfragenIDs)
+
+    # fuer die Standardfragen versuchen wir mal eine andere Iteration:
+    # print "standardfragen"
+    if schlagwortIDs:
+        standardFragenIDs = set()
+        for s in schlagwortIDs:
+            # print models.Schlagwort.objects.get(pk=s)
+            qs = models.StandardFrage.objects.filter(schlagworte__id__exact = s)
+            # print set([x.id for x in qs])
+            standardFragenIDs |= set([x.id for x in qs])
+
+        standardFragenIDs = list(standardFragenIDs)
+    else:
+        standardFragenIDs = [x.pk for x in
+                             models.StandardFrage.objects.all().filter (stufe__stufe__exact = stufe)
+        ]
+
+    return (mcfragenIDs, standardFragenIDs)
+
+###################
+
 class stufe(FormView):
     form_class = forms.stufeForm
     template_name = "klausurensammlung/stufe.html"
@@ -61,14 +119,8 @@ class schlagworte (View):
         #                                     ('c','c'),
         #                                     ('d','d'),)
 
-        mcSchlagwortIds = [x['schlagworte'] for x in
-                           models.MCFrage.objects.all().filter (stufe__stufe__exact = stufe).values('schlagworte').distinct()]
-        standardFrageSchlagwortIds = [x['schlagworte'] for x in
-                                      models.StandardFrage.objects.all().filter (stufe__stufe__exact = stufe).values('schlagworte').distinct()]
 
-        # pp(mcSchlagwortIds)
-
-        schlagwortIds = set(mcSchlagwortIds) | set (standardFrageSchlagwortIds)
+        schlagwortIds = getSchlagwortIdsFromStufe(stufe)
         # pp(schlagwortIds)
         ff.fields['Schlagworte'].choices = ( (x,
                                               models.Schlagwort.objects.get (pk=x).__unicode__())
@@ -95,35 +147,8 @@ class schlagworte (View):
 
         # berechne die Fragen-IDs
         # print "fragen"
-        mcfragenIDs = []
 
-        if schlagwortIDs:
-            for x in models.MCFrage.objects.all():
-                thisQuestionSchlagwortIDs = [y.pk for y in x.schlagworte.all()]
-                # print x.pk, thisQuestionSchlagwortIDs
-                # print set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))
-                if bool(set(schlagwortIDs).intersection(set(thisQuestionSchlagwortIDs))):
-                    mcfragenIDs.append(str(x.pk))
-        else:
-            mcfragenIDs = [str(x.pk) for x in models.MCFrage.objects.filter(stufe__stufe__exact = stufe)]
-
-        # pp(mcfragenIDs)
-
-        # fuer die Standardfragen versuchen wir mal eine andere Iteration:
-        # print "standardfragen"
-        if schlagwortIDs:
-            standardFragenIDs = set()
-            for s in schlagwortIDs:
-                # print models.Schlagwort.objects.get(pk=s)
-                qs = models.StandardFrage.objects.filter(schlagworte__id__exact = s)
-                # print set([x.id for x in qs])
-                standardFragenIDs |= set([x.id for x in qs])
-
-            standardFragenIDs = list(standardFragenIDs)
-        else:
-            standardFragenIDs = [x.pk for x in
-                                 models.StandardFrage.objects.all().filter (stufe__stufe__exact = stufe)
-                                 ]
+        mcfragenIDs, standardFragenIDs = getQuestionIdsFromSchlagwortIDs(schlagwortIDs)
 
         # print standardFragenIDs
 
@@ -134,7 +159,7 @@ class schlagworte (View):
                          (stufe,
                           ','.join([str(x) for x in schlagwortIDs]),
                           ','.join([str(x) for x in standardFragenIDs]),
-                          ','.join(mcfragenIDs)))
+                          ','.join([str(x) for x in mcfragenIDs])))
 
 
 
@@ -402,4 +427,140 @@ class makePDF(View):
         return concatProcess.returncode
 
 
+###############################
 
+class filtertab(View):
+
+    @method_decorator (login_required)
+    def get(self, request):
+        ff = forms.filtertab()
+
+        print ff
+
+        return render (request,
+                       'klausurensammlung/filtertab.html',
+                        {'form': ff})
+
+
+    @method_decorator (login_required)
+    def post(self, request):
+
+        ff = forms.filtertab(request.POST)
+        if ff.is_valid():
+            print "form is valid"
+        else:
+            print "form not valid"
+
+        print ff.cleaned_data
+
+        originalSelection = ff.cleaned_data
+
+        if 'filter' in request.POST:
+
+            # based on Stufe: narrow down the questions to show as well as the options for Schlagworte
+
+            if originalSelection['Stufe']:
+                qsMC = models.MCFrage.objects.filter(stufe__stufe__exact =
+                        originalSelection['Stufe'].stufe)
+                qsSt = models.StandardFrage.objects.filter(stufe__stufe__exact =
+                        originalSelection['Stufe'].stufe)
+            else:
+                qsMC = models.MCFrage.objects.all()
+                qsSt = models.StandardFrage.objects.all()
+
+            print qsMC
+            print qsSt
+
+            newSchlagwortIDs = list(set([x['schlagworte']
+                                         for x in qsMC.order_by('schlagworte').values('schlagworte').distinct()])
+                                        |
+                                    set([x['schlagworte']
+                                         for x in qsSt.order_by('schlagworte').values('schlagworte').distinct()]))
+            qsSchlagwworte = models.Schlagwort.objects.filter (id__in = newSchlagwortIDs)
+            print qsSchlagwworte
+            print "----------"
+
+            # were any Schlagworte selected? This FURTHER narrows down the possible choices for questions
+            print ff.cleaned_data['Schlagworte']
+
+            if ff.cleaned_data['Schlagworte']:
+                qsMC = qsMC.filter (schlagworte__in = ff.cleaned_data['Schlagworte'])
+                qsSt = qsSt.filter (schlagworte__in = ff.cleaned_data['Schlagworte'])
+
+            print qsMC
+
+            print "----------"
+
+            #### add the already selected questions back into the queryset:
+            qsMCSelected = models.MCFrage.objects.filter (pk__in = ff.cleaned_data['mcfragenliste'])
+            qsMC = qsMC | qsMCSelected
+            qsMC = qsMC.distinct()
+
+            print qsMC
+
+            qsStSelected = models.StandardFrage.objects.filter (pk__in = ff.cleaned_data['stfragenliste'])
+            qsSt = qsSt | qsStSelected
+            qsSt = qsSt.distinct()
+
+            print "----------"
+
+
+            # put these QSs into the form fields
+
+            ff.fields['Schlagworte'].queryset = qsSchlagwworte
+            ff.fields['stfragenliste'].queryset = qsSt
+            ff.fields['mcfragenliste'].queryset = qsMC
+
+            ###########################
+
+            # # what are the new questions to ask?
+            # mcfragenIDs, standardFragenIDs = getQuestionIdsFromSchlagwortIDs([x.pk
+            #                                                                   for x in
+            #                                                                   ff.cleaned_data['Schlagworte']])
+            #
+            #
+            # # Stufe determines Schlagworte
+            # # separate: which schlagworte to disaply, and which ones have been selected
+            #
+            # if originalSelection['Stufe']:
+            #     # Schlagworte
+            #     newSchlagwortIDs = getSchlagwortIdsFromStufe(originalSelection['Stufe'].stufe)
+            #     ff.fields['Schlagworte'].queryset = models.Schlagwort.objects.filter(id__in=
+            #                                             newSchlagwortIDs)
+            # else:
+            #     # Schlagworte
+            #     qs = models.Schlagwort.objects.all()
+            #     newSchlagwortIDs = [x.pk for x in qs]
+            #     ff.fields['Schlagworte'].queryset = qs
+            #
+            # print "schlagworte", newSchlagwortIDs
+            #
+            # print mcfragenIDs, standardFragenIDs
+            #
+            # # compute the set of question IDs both from the field filter and the questions arlready answered
+            # # this needs more thought...
+            # standardIDs = list(set(standardFragenIDs) |
+            #                        set([x.pk for x in originalSelection['stfragenliste']]))
+            #
+            # ff.fields['stfragenliste'].queryset = models.StandardFrage.objects.filter(id__in=
+            #     standardIDs)
+            #
+            # mcIDs = list(set(mcfragenIDs) |
+            #              set([x.pk for x in originalSelection['mcfragenliste']]))
+            # ff.fields['mcfragenliste'].queryset = models.MCFrage.objects.filter(id__in=
+            #     mcfragenIDs)
+            #
+            # # die Fragen noch nach Stufe filtern?
+            # if originalSelection['Stufe']:
+            #     ff.fields['stfragenliste'].queryset = ff.fields['stfragenliste'].queryset.filter(stufe__stufe__exact =
+            #                                                 originalSelection['Stufe'].stufe)
+
+            return render (request,
+                            'klausurensammlung/filtertab.html',
+                           {'form': ff})
+
+        elif 'klausur' in request.POST:
+            return redirect ('/klausurensammlung/makePDF/st=%s/mc=%s/' %
+                             (','.join([str(x.pk) for x in ff.cleaned_data['stfragenliste']]),
+                              ','.join([str(x.pk) for x in ff.cleaned_data['mcfragenliste']])))
+            pass
