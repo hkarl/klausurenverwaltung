@@ -24,6 +24,9 @@ IMPORTANT: make sure to install ab 1.4.x Django. The code does not work with Dja
 
 $ sudo pip install django_select2
 
+- install model-utils:
+$ pip install django-model-utils
+
 - highly recommended: install GIT  - http://git-scm.com/download/mac
  (standard MAC installation practice; should be easy to install on Linux as well)
 
@@ -84,7 +87,11 @@ the right with the right arrow; click "Sichern" )
  this file if necessary.
 
 
-TODO: make this work under an apache installation!!
+TODO:
+- make this work under an apache installation!!
+- better control the user rights... currently, this is in UserAccessInfo (admin.ModelAdmin) in admin.py,
+but that does not seem to work. think about https://github.com/chrisglass/django-rulez
+- try databrowse app or similar https://pypi.python.org/pypi/django-databrowse
 
 
 

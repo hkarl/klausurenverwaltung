@@ -3,7 +3,7 @@ from django import forms
 import models
 from django_select2.fields import Select2MultipleChoiceField, Select2ChoiceField, ModelSelect2Field, ModelSelect2MultipleField
 from django_select2.widgets import Select2MultipleWidget, Select2Widget
-
+from django.contrib.auth.models import User
 # basic python infrastrtucture
 from pprint import pprint as pp 
 
@@ -56,11 +56,15 @@ class Klausurparameter (forms.Form):
 
 
 class filtertab (forms.Form):
-    Stufe = ModelSelect2Field  (queryset=models.Stufe.objects.all(), required=False)
-    # Schlagworte = Select2MultipleChoiceField (widget=Select2MultipleWidget(select2_options={'minimumResultsForSearch': 2,
-    #                                                                                         'width': u'resolve',
-    #                                                                                         'allowClear': 'true',
-    #                                                                                         }) )
+    Ersteller = ModelSelect2MultipleField (queryset=User.objects.all(),
+                                   required = False)
+    # LetzterEditor = ModelSelect2Field (queryset=User.objects.all(),
+    #                                    required=False)
+
+    Fach = ModelSelect2MultipleField  (queryset=models.Fach.objects.all(), required=False)
+    Reihe = ModelSelect2MultipleField  (queryset=models.Reihe.objects.all(), required=False)
+    Stufe = ModelSelect2MultipleField  (queryset=models.Stufe.objects.all(), required=False)
+
     Schlagworte = ModelSelect2MultipleField (queryset=models.Schlagwort.objects.all(),
                                              required=False)
 
