@@ -435,7 +435,7 @@ class filtertab(View):
     def get(self, request):
         ff = forms.filtertab()
 
-        print ff
+        # print ff
 
         return render (request,
                        'klausurensammlung/filtertab.html',
