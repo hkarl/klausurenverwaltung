@@ -17,7 +17,8 @@ $ sudo easy_install pip
 
 $ sudo pip install Django
 
-IMPORTANT: make sure to install ab 1.4.x Django. The code does not work with Django 1.5!
+Note: development takes place under django 1.4; it should work with djhango 1.5 as well,
+which is  typically installed by pip
 (if necessary, install from here: https://www.djangoproject.com/download/ and follow instructions) 
 
 - install django-select2
