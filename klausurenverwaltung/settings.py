@@ -170,4 +170,4 @@ LOGGING = {
 LATEXDIR = "latex"
 BINDIR = "bin"
 PERMUTER = "permuter.py"
-PDFTK = "/usr/local/bin/pdftk"
+PDFTK = "pdftk"
