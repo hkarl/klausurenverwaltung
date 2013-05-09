@@ -22,7 +22,12 @@ class UserAccessInfo (admin.ModelAdmin):
         obj.save()
 
     def has_permissions (self,request, obj=None):
-        # print "has permissions", obj, request.user
+        print "has permissions", obj, request.user
+        return True
+    
+    def has_change_permission(self, request, obj=None):
+        # r = self.has_permissions(request, obj)
+        print "has change permission"
         if obj:
             if (obj.creator == request.user or
                 request.user.is_superuser):
@@ -32,15 +37,19 @@ class UserAccessInfo (admin.ModelAdmin):
         else:
             return True
 
-    def has_change_permission(self, request, obj=None):
-        r = self.has_permissions(request, obj)
-        # print "has change permission", r
-        return r
 
     def has_delete_permission(self, request, obj=None):
-        r=self.has_permissions(request, obj)
-        # print "has delerte permission", r
-        return r
+        # r=self.has_permissions(request, obj)
+        print "has delerte permission"
+        if obj:
+            if (obj.creator == request.user or
+                request.user.is_superuser):
+                return True
+            else:
+                return False
+        else:
+            return True
+
 
     date_hierarchy = 'edited'
     list_filter = ['stufe__stufe', 'fach__fach', 'reihe__reihe', 'lastEditor']
