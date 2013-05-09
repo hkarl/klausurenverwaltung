@@ -468,25 +468,25 @@ class filtertab(View):
             if ff.cleaned_data['Ersteller']:
                 qsTmp = models.basicFrage.objects.filter (creator__in = ff.cleaned_data['Ersteller'])
                 qsFragen = qsFragen & qsTmp
-                qsReihe = qsReihe.filter(basicfrage__id__in = qsTmp)
-                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp)
+                qsReihe = qsReihe.filter(basicfrage__id__in = qsTmp).distinct()
+                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp).distinct()
 
             if ff.cleaned_data['Fach']:
                 qsTmp = models.basicFrage.objects.filter (fach__in = ff.cleaned_data['Fach'])
                 qsFragen = qsFragen & qsTmp
-                qsReihe = qsReihe.filter(basicfrage__id__in = qsTmp)
-                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp)
+                qsReihe = qsReihe.filter(basicfrage__in = qsTmp).distinct()
+                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp).distinct()
 
             if ff.cleaned_data['Stufe']:
                 qsTmp = models.basicFrage.objects.filter (stufe__in = ff.cleaned_data['Stufe'])
                 qsFragen = qsFragen & qsTmp
-                qsReihe = qsReihe.filter(basicfrage__id__in = qsTmp)
-                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp)
+                qsReihe = qsReihe.filter(basicfrage__id__in = qsTmp).distinct()
+                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp).distinct()
 
             if ff.cleaned_data['Reihe']:
                 qsTmp = models.basicFrage.objects.filter (reihe__in = ff.cleaned_data['Reihe'])
                 qsFragen = qsFragen & qsTmp
-                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp)
+                qsSchlagwworte = qsSchlagwworte.filter (basicfrage__id__in = qsTmp).distinct()
 
 
             # and now find the actual questions
@@ -496,16 +496,16 @@ class filtertab(View):
 
             # add in all the questions, reihe, schlagworte that had already been selected
             if ff.cleaned_data['Reihe']:
-                qsReihe = qsReihe | models.Reihe.objects.filter(id__in = ff.cleaned_data['Reihe'])
+                qsReihe = qsReihe | models.Reihe.objects.filter(id__in = ff.cleaned_data['Reihe']).distinct()
 
             if ff.cleaned_data['Schlagworte']:
-                qsSchlagwworte = qsSchlagwworte | models.Schlagwort.objects.filter(id__in = ff.cleaned_data['Schlagworte'])
+                qsSchlagwworte = qsSchlagwworte | models.Schlagwort.objects.filter(id__in = ff.cleaned_data['Schlagworte']).distinct()
 
             if ff.cleaned_data['stfragenliste']:
-                qsSt = qsSt | models.StandardFrage.objects.filter(id__in = ff.cleaned_data['stfragenliste'])
+                qsSt = qsSt | models.StandardFrage.objects.filter(id__in = ff.cleaned_data['stfragenliste']).distinct()
 
             if ff.cleaned_data['mcfragenliste']:
-                qsMC = qsMC | models.MCFrage.objects.filter(id__in = ff.cleaned_data['mcfragenliste'])
+                qsMC = qsMC | models.MCFrage.objects.filter(id__in = ff.cleaned_data['mcfragenliste']).distinct()
 
             ##################################
 
