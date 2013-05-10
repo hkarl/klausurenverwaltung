@@ -9,12 +9,57 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<h3>Sie können hier Filterkriterien vorgeben:</h3>
 
 <form action = "filtertab" method="POST">
 {% csrf_token %}
+<p>
+Ersteller der Aufgabe: {{form.Ersteller}}
+</p> 
+<p> Fach: {{ form.Fach}} </p>
+<p> Reihe: {{ form.Reihe}} </p>
+<p> Stufe: {{ form.Stufe}} </p>
+<p> Schlagewort: {{ form.Schlagworte}} </p>
+
+
 <input type="submit" name="filter" value="Filter anwenden" />
 <input type="submit" name="klausur" value="Klausur erstellen" />
-{{ form.as_p }}
+
+<h3> Wählen Sie hier die einzelnen Fragen aus </h3>
+
+<h4> Welche Standardfragen in die Klausur aufnehmen? </h4>
+
+
+<ul>
+{% for pk, choice in form.stfragenliste.field.widget.choices %}
+<li>  <label for = "id_stfragenliste_{{forloop.counter0}}">
+  <input   {% if pk|slugify in form.stfragenliste.value %} checked="checked" {% endif %}
+       id="id_stfragenliste_{{forloop.counter0}}"
+       name="stfragenliste" type="checkbox" value="{{pk}}"/>
+  <a href = "{% url 'standardfrage' pk %}" target="_blank"> {{choice}}  </a>
+</label>
+</li> 
+{% endfor %}
+</ul> 
+
+
+
+<h4> Welche Multiple-Choice-Fragen in die Klausur aufnehmen? </h4>
+
+<ul>
+{% for pk, choice in form.mcfragenliste.field.widget.choices %}
+<li>  <label for = "id_mcfragenliste_{{forloop.counter0}}">
+  <input   {% if pk|slugify in form.mcfragenliste.value %} checked="checked" {% endif %}
+     id="id_mcfragenliste_{{forloop.counter0}}" name="mcfragenliste" type="checkbox" value="{{pk}}"/>
+  <a href = "{% url 'mcfrage' pk %}" target="_blank"> {{choice}}  </a> 
+ </label>
+</li> 
+{% endfor %}
+</ul> 
+
+
 </form>
+
+
 
 {% endblock %}

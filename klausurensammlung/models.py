@@ -3,6 +3,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse 
+from django.http import HttpResponseRedirect 
 from model_utils.managers import InheritanceManager
 
 
@@ -122,6 +124,9 @@ class StandardFrage (basicFrage):
     def __unicode__(self):
         return "Q: %s ; A: %s" % (self.frage[:50], self.antwort[:50])
 
+    def get_absolute_url (self):
+        r = reverse ('standardfrage', args=[str(self.id)])
+        return r
 
     class Meta (basicFrage.Meta):
         verbose_name = "Standard-Frage"
@@ -144,6 +149,9 @@ class MCFrage(basicFrage):
     def __unicode__(self):
         return "Q: %s ; A: %s" % (self.frage[:50], self.richtigeAntwort[:50])
 
+    def get_absolute_url (self):
+        r = reverse ('mcfrage', args=[str(self.id)])
+        return r
 
     class Meta (basicFrage.Meta):
         verbose_name_plural = "Multiple-Choice-Fragen"

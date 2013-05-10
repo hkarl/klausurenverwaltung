@@ -502,10 +502,10 @@ class filtertab(View):
                 qsSchlagwworte = qsSchlagwworte | models.Schlagwort.objects.filter(id__in = ff.cleaned_data['Schlagworte']).distinct()
 
             if ff.cleaned_data['stfragenliste']:
-                qsSt = qsSt | models.StandardFrage.objects.filter(id__in = ff.cleaned_data['stfragenliste']).distinct()
+                qsSt = qsSt | models.StandardFrage.objects.filter(id__in = ff.cleaned_data['stfragenliste'])
 
             if ff.cleaned_data['mcfragenliste']:
-                qsMC = qsMC | models.MCFrage.objects.filter(id__in = ff.cleaned_data['mcfragenliste']).distinct()
+                qsMC = qsMC | models.MCFrage.objects.filter(id__in = ff.cleaned_data['mcfragenliste'])
 
             ##################################
 
@@ -525,3 +525,27 @@ class filtertab(View):
                              (','.join([str(x.pk) for x in ff.cleaned_data['stfragenliste']]),
                               ','.join([str(x.pk) for x in ff.cleaned_data['mcfragenliste']])))
             pass
+
+
+class standardfrage (View):
+    
+    @method_decorator (login_required)
+    def get(self, request, args):
+        q = models.StandardFrage.objects.get(pk=args)
+        f = forms.standardfrageForm (instance=q) 
+        
+        return render (request,
+                       'klausurensammlung/standardfrage.html',
+                       {'form': f})
+
+
+class mcfrage (View):
+    
+    @method_decorator (login_required)
+    def get(self, request, args):
+        q = models.MCFrage.objects.get(pk=args)
+        f = forms.mcfrageForm (instance=q) 
+        
+        return render (request,
+                       'klausurensammlung/mcfrage.html',
+                       {'form': f})

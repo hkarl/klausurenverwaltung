@@ -79,3 +79,16 @@ class filtertab (forms.Form):
                                                choices = [],
                                                widget = forms.widgets.CheckboxSelectMultiple(),
                                                required=False)
+
+
+###########
+# Model forms
+
+class standardfrageForm (forms.ModelForm):
+    class Meta:
+        model = models.StandardFrage
+        
+class mcfrageForm (forms.ModelForm):
+    class Meta:
+        model = models.MCFrage
+

@@ -22,12 +22,12 @@ class UserAccessInfo (admin.ModelAdmin):
         obj.save()
 
     def has_permissions (self,request, obj=None):
-        print "has permissions", obj, request.user
+        # print "has permissions", obj, request.user
         return True
     
     def has_change_permission(self, request, obj=None):
         # r = self.has_permissions(request, obj)
-        print "has change permission"
+        # print "has change permission"
         if obj:
             if (obj.creator == request.user or
                 request.user.is_superuser):
@@ -40,7 +40,7 @@ class UserAccessInfo (admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         # r=self.has_permissions(request, obj)
-        print "has delerte permission"
+        # print "has delerte permission"
         if obj:
             if (obj.creator == request.user or
                 request.user.is_superuser):
