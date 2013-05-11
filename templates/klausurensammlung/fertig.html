@@ -7,24 +7,25 @@
 
 <h2> Hier ist Ihre gewünschte Klausur </h2>
 
+
 <h3>Die PDF-Files</h3>
 
     <ul>
     <li> Die Gesamtklausur
         <ul>
-            <li>   <a href="{% static "komplett.pdf" %}"> Alle Lösungen, dann alle Aufgaben </a>(für alle Schüler) </li>
-            <li>   <a href="{% static "aufgaben.pdf" %}"> Alle Aufgaben </a>(für alle Schüler) </li>
-            <li>   <a href="{% static "loesungen.pdf" %}"> Alle Lösungen </a></li>
+            <li>   <a href="{% static user.username|add:"/komplett.pdf" %}"> Alle Lösungen, dann alle Aufgaben </a>(für alle Schüler) </li>
+          <li>   <a href="{% static user.username|add:"/aufgaben.pdf" %}"> Alle Aufgaben </a>(für alle Schüler) </li>
+            <li>   <a href="{% static user.username|add:"/loesungen.pdf" %}"> Alle Lösungen </a></li>
         </ul>
     </li>
     <li> Die einzelnen Varianten </li>
         {%  for i in klausurVarianten  %}
-            <a href="{% static i %}" > {{ i }}</a>
+            <a href="{% static user.username|add:"/"|add:i %}" > {{ i }}</a>
             <br>
         {%  endfor  %}
     <li> Die einzelnen Lösungen </li>
         {%  for i in loesungVarianten  %}
-            <a href="{% static i %}" >  {{ i }}</a>
+            <a href="{% static user.username|add:"/"|add:i %}" >  {{ i }}</a>
             <br>
         {%  endfor  %}
     </ul>
@@ -32,11 +33,11 @@
 <h3> Die Tex-Files </h3>
 
     <ul>
-    <li> <a href="{% static "klausur.tex" %}"> Klausur Rohfassung</a> </li>
+    <li> <a href="{% static user.username|add:"/"|add:"klausur.tex" %}"> Klausur Rohfassung</a> </li>
     <li> Die einzelnen Varianten </li>
     <ul>
         {%  for i in texVarianten  %}
-        <a href="{% static i %}" >  {{ i }}</a>
+        <a href="{% static user.username|add:"/"|add:i %}" >  {{ i }}</a>
             <br>
         {%  endfor  %}
     </ul>
@@ -47,11 +48,11 @@
 
     <ul>
     <li> Das Permuter-Skript gab folgenden Rückgabewert: {{ permuterRetcode }} (sollte 0 sein) </li>
-    <li> <a href="{% static "permuter.out" %}">Ausgabe des permuter-Scripts </a></li>
-    <li> <a href="{% static "permuter.err" %}">Fehlermeldungen des permuter-Scripts </a></  li>
-    <li> concat aufgaben <a href="{% static "concat-aufgaben.out" %}">out</a> <a href="{% static "concat-aufgaben.err" %}">err</a> </li>
-        <li> concat loesungen <a href="{% static "concat-loesungen.out" %}">out</a> <a href="{% static "concat-loesungen.err" %}">err</a> </li>
-        <li> concat komplett <a href="{% static "concat-komplett.out" %}">out</a> <a href="{% static "concat-komplett.err" %}">err</a> </li>
+    <li> <a href="{% static user.username|add:"/"|add:"permuter.out" %}">Ausgabe des permuter-Scripts </a></li>
+    <li> <a href="{% static user.username|add:"/"|add:"permuter.err" %}">Fehlermeldungen des permuter-Scripts </a></  li>
+    <li> concat aufgaben <a href="{% static user.username|add:"/"|add:"concat-aufgaben.out" %}">out</a> <a href="{% static user.username|add:"/"|add:"concat-aufgaben.err" %}">err</a> </li>
+        <li> concat loesungen <a href="{% static user.username|add:"/"|add:"concat-loesungen.out" %}">out</a> <a href="{% static user.username|add:"/"|add:"concat-loesungen.err" %}">err</a> </li>
+        <li> concat komplett <a href="{% static user.username|add:"/"|add:"concat-komplett.out" %}">out</a> <a href="{% static user.username|add:"/"|add:"concat-komplett.err" %}">err</a> </li>
     </ul>
 
 

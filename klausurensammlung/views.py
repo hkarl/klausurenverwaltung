@@ -22,6 +22,7 @@ from django.utils.decorators import method_decorator
 # basic python infrastrtucture
 from pprint import pprint as pp 
 import codecs, os, subprocess 
+import shutil
 
 
 
@@ -226,6 +227,28 @@ class klausur(View):
 
 class makePDF(View):
 
+
+    def ensureUserDir (self, ud):
+        
+        """Make sure that the latex directory for the user exists and that all relevant
+        files are included in it.
+        Problem: What a 'relevant' file is depends on the OS and TeX installation.
+        """
+
+        # make sure the directory exists, create if necessary:
+
+        if not os.path.isdir (ud):
+            os.mkdir (ud)
+
+        # does it contain all the files listed in settings.NEEDEFILES ?
+        for nf in os.listdir (settings.LATEXDIR):
+            full_in_file = os.path.join (settings.LATEXDIR, nf)
+            if (os.path.isfile (full_in_file)):
+                shutil.copyfile (full_in_file,
+                                 os.path.join (ud, nf))
+            
+        
+
     @method_decorator (login_required)
     def get(self, request, stids, mcids):
         # print request.GET
@@ -314,12 +337,20 @@ class makePDF(View):
 """ %  '\n'.join(questionsList)
 
 
+        ######################################
+        # anything that deals with files 
 
-        # print questions
-        # print settings.LATEXDIR
+        ## print settings.LATEXDIR
+        ## print request.user.username
+        ## print type(request.user.username)
+
+        userlatexdir = os.path.join (settings.LATEXDIR, request.user.username)
+
+        self.ensureUserDir (userlatexdir) 
+        
         # print os.getcwd()
 
-        fp = open (os.path.join(settings.LATEXDIR, "questions.tex"), 'w')
+        fp = open (os.path.join(userlatexdir, "questions.tex"), 'w')
         fp.write(questions.encode('utf-8'))
         fp.close()
 
@@ -333,30 +364,30 @@ class makePDF(View):
         """ % (klausurDatum.strftime('%d.%m.%Y'), klausurFach, klausurLaufendeNummer,
                 klausurBoxtext)
 
-        fp = open (os.path.join(settings.LATEXDIR, "header.tex"), 'w')
+        fp = open (os.path.join(userlatexdir, "header.tex"), 'w')
         fp.write (header.encode('utf-8'))
         fp.close
 
 
         # flatten the input file
-        fp = codecs.open (os.path.join (settings.LATEXDIR, "klausur-template.tex"), 'r', encoding='utf-8')
+        fp = codecs.open (os.path.join (userlatexdir, "klausur-template.tex"), 'r', encoding='utf-8')
         klausur = fp.read()
         fp.close()
 
         # replace header and questions
         klausur = re.sub(r'\\input{header}', header, klausur)
         klausur = re.sub(r'\\input{questions}', questions, klausur)
-        fp = open (os.path.join(settings.LATEXDIR, "klausur.tex"), 'w')
+        fp = open (os.path.join(userlatexdir, "klausur.tex"), 'w')
         fp.write (klausur.encode('utf-8'))
         fp.close()
 
 
         # run permuter on it
-        permuterOut = open (os.path.join(settings.LATEXDIR, 'permuter.out'), 'w')
-        permuterErr = open (os.path.join(settings.LATEXDIR, 'permuter.err'), 'w')
+        permuterOut = open (os.path.join(userlatexdir, 'permuter.out'), 'w')
+        permuterErr = open (os.path.join(userlatexdir, 'permuter.err'), 'w')
         # print os.getcwd()
         # print os.path.join(settings.BINDIR, settings.PERMUTER)
-        # print settings.LATEXDIR
+        # print userlatexdir
         permuterProcess  = subprocess.Popen ([os.path.join(os.getcwd(),
                                                    settings.BINDIR,
                                                    settings.PERMUTER),
@@ -365,7 +396,7 @@ class makePDF(View):
                                      "-l",
                                      "-i", "klausur.tex",
                                      ],
-                                     cwd = settings.LATEXDIR,
+                                     cwd = userlatexdir,
                                      stderr=permuterErr,
                                      stdout = permuterOut)
 
@@ -390,9 +421,12 @@ class makePDF(View):
         # print inputAlles
 
         concatReval = {}
-        concatReval['loesung'] = self.concatPDFs(inputNurLoesungen, "loesungen")
-        concatReval['aufgaben'] = self.concatPDFs(inputNurAufgaben, "aufgaben")
-        concatReval['komplett'] = self.concatPDFs(inputAlles, "komplett")
+        concatReval['loesung'] = self.concatPDFs(inputNurLoesungen,
+                                                 "loesungen", userlatexdir)
+        concatReval['aufgaben'] = self.concatPDFs(inputNurAufgaben,
+                                                  "aufgaben", userlatexdir)
+        concatReval['komplett'] = self.concatPDFs(inputAlles,
+                                                  "komplett", userlatexdir)
 
 
 
@@ -411,12 +445,12 @@ class makePDF(View):
                          })
     
 
-    def concatPDFs (self, l, s):
-        concatOut = open (os.path.join(settings.LATEXDIR, 'concat-%s.out' % s), 'w')
-        concatErr = open (os.path.join(settings.LATEXDIR, 'concat-%s.err' % s), 'w')
+    def concatPDFs (self, l, s, userlatexdir):
+        concatOut = open (os.path.join(userlatexdir, 'concat-%s.out' % s), 'w')
+        concatErr = open (os.path.join(userlatexdir, 'concat-%s.err' % s), 'w')
 
         concatProcess  = subprocess.Popen ([settings.PDFTK] + l + ['output', s + '.pdf'],
-                                             cwd = settings.LATEXDIR,
+                                             cwd = userlatexdir,
                                              stderr=concatErr,
                                              stdout = concatOut)
 
