@@ -7,7 +7,9 @@ from django.contrib.auth.models import User
 # basic python infrastrtucture
 from pprint import pprint as pp 
 
-class stufeForm (forms.Form):
+import datetime
+
+class stufeForm(forms.Form):
     # Stufe = forms.fields.ChoiceField (choices=sorted([(x.stufe, x.__unicode__())
     #                                                   for x in models.Stufe.objects.all() ]),
     #                                   required=True)
@@ -19,16 +21,20 @@ class stufeForm (forms.Form):
     #                                                                   }),
     #                                   required=True)
 
-    Stufe = ModelSelect2Field  (queryset=models.Stufe.objects.all(), required=True)
+    Stufe = ModelSelect2Field  (queryset=models.Stufe.objects.all(),
+                                required=True,
+                                )
 
+    
 
 class schlagworteForm (forms.Form):
 
     # Schlagworte = forms.fields.MultipleChoiceField ( )
-    Schlagworte = Select2MultipleChoiceField (widget=Select2MultipleWidget(select2_options={'minimumResultsForSearch': 2,
-                                                                                            'width': u'resolve',
-                                                                                            'allowClear': 'true',
-                                                                                            }) )
+    Schlagworte = Select2MultipleChoiceField(widget=Select2MultipleWidget(
+        select2_options={'minimumResultsForSearch': 2,
+                         'width': u'resolve',
+                         'allowClear': 'true',
+                        }))
 
 
 
@@ -44,11 +50,16 @@ class KlausurlisteForm (forms.Form):
 
 
 class Klausurparameter (forms.Form):
-    anzahlSchueler = forms.CharField (label="Wieviele Schüler?")
-    anzahlVarianten = forms.CharField (label="Wieviele Varianten der Klausur?")
-    klausurDatum = forms.DateField (label="An welchem Tag findet die Klausur statt?")
-    klausurFach = forms.CharField(label="In welchem Fach?")
-    klausurLaufendeNummer =forms.CharField (label="Laufende Nummer der Klausur? (z.B. 7. Test, 9a)")
+    anzahlSchueler = forms.CharField (label="Wieviele Schüler?",
+                                      initial=1)
+    anzahlVarianten = forms.CharField (label="Wieviele Varianten der Klausur?",
+                                       initial=1)
+    klausurDatum = forms.DateField (label="An welchem Tag findet die Klausur statt?",
+                                    initial=datetime.date.today()+datetime.timedelta(days=1))
+    klausurFach = forms.CharField(label="In welchem Fach?",
+                                  initial="Physik")
+    klausurLaufendeNummer =forms.CharField (label="Laufende Nummer der Klausur? (z.B. 7. Test, 9a)",
+                                            initial="Test 1, Klasse 9a")
     klausurBoxtext = forms.CharField(label="WelcherText soll in die Box gesetzt werden?",
                                      widget=forms.Textarea,
                                      initial="Kreuze die korrekte Lösung an. Es gibt für jede Frage nur eine korrekte Lösung.")

@@ -23,7 +23,7 @@ from django.utils.decorators import method_decorator
 from pprint import pprint as pp 
 import codecs, os, subprocess 
 import shutil
-
+import datetime
 
 
 ###########
@@ -88,7 +88,17 @@ class stufe(FormView):
     form_class = forms.stufeForm
     template_name = "klausurensammlung/stufe.html"
     success_url = "/klausurensammlung/schlagworte/stufe="
-        
+
+    def get_initial(self):
+        """Return the first Stufe to be used as default value"""
+
+        initial = super(stufe, self).get_initial()
+
+        initial['Stufe'] = models.Stufe.objects.first()
+
+        print "get_initial in stufeForm: ", initial
+        return initial
+    
     def get_success_url (self):
         # target = stufe.success_url + "stufe=" + self.stufe + "/"
 
@@ -109,12 +119,15 @@ class schlagworte (View):
     """
     Present the schlageworte multiple choice using a standard view, not the complex mixin FormView
     """
-
+                  
+    
     @method_decorator (login_required)
     def get (self, request, stufe):
         # print "in get", stufe
 
-        ff = forms.schlagworteForm ()
+        ff = forms.schlagworteForm(
+            initial={'Schlagworte': (models.Schlagwort.objects.first(),)})
+        
         # ff.fields['Schlagworte'].choices = (('a','a'),
         #                                     ('b','b'),
         #                                     ('c','c'),
@@ -275,7 +288,6 @@ class makePDF(View):
                            {'stfragenliste': stids,
                             'mcfragenliste': mcids,
                             'form': ff})
-
 
         # Felder des Formats auswerten:
         anzahlSchueler = ff.cleaned_data['anzahlSchueler']
